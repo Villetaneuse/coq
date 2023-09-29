@@ -65,57 +65,9 @@ Proof.
   now apply (Rlt_irrefl (Rabs r)), H, H'.
 Qed.
 
-(* NEW, TODO move to RIneq *)
-Lemma Rle_plus_nneg : forall r1 r2, 0 <= r2 -> r1 <= r1 + r2.
-Proof. now intros r1 r2 H; apply Rge_le, Rplus_nneg_ge, Rle_ge. Qed.
-
-(* NEW, TODO move to RIneq *)
-Lemma Rle_plus_npos : forall r1 r2, r2 <= 0 -> r1 + r2 <= r1.
-Proof.
-  now intros r1 r2 H2; rewrite <-(Rplus_0_r r1) at 2; apply Rplus_le_compat;
-    [apply Rle_refl |].
-Qed.
-
-(* NEW TODO: move to RIneq *)
-Lemma Rdiv_opp_opp : forall r1 r2, - r1 / - r2 = r1 / r2.
-Proof. now intros r1 r2; rewrite Rdiv_opp_l, Rdiv_opp_r, Ropp_involutive. Qed.
-
-(* NEW TODO: move to RIneq *)
-Lemma Rdiv_minus_minus_sym :
-  forall r1 r2 r3 r4, (r1 - r2) / (r3 - r4) = (r2 - r1) / (r4 - r3).
-Proof. now intros r1 r2 r3 r4; rewrite <-Rdiv_opp_opp, 2Ropp_minus_distr. Qed.
-
-(* NEW : name? *)
-Lemma Rminus_le_swap : forall r r1 r2, r1 - r <= r2 -> r1 - r2 <= r.
-Proof.
-  intros r r1 r2 H.
-  now apply Rle_minus_chsd_rr; rewrite Rplus_comm; apply Rle_minus_chsd_rr.
-Qed.
-
 (* TODO: strengthen, rename and move to RIneq *)
 Lemma tech7 : forall r1 r2:R, r1 <> 0 -> r2 <> 0 -> r1 <> r2 -> / r1 <> / r2.
 Proof. now intros r1 r2 _ _ H contra%Rinv_eq_reg. Qed.
-
-(* NEW, for symmetry with is_upper_bound TODO: move to Rdefinitions *)
-Definition is_lower_bound (E : R -> Prop) (m : R) :=
-  forall x, E x -> m <= x.
-
-(* NEW, for symmetry with is_upper_bound TODO: move to Rdefinitions *)
-Definition is_glb (E : R -> Prop) (m : R) :=
-  is_lower_bound E m /\ (forall b, is_lower_bound E b -> b <= m).
-
-(* NEW, TODO move *)
-Lemma Rdiv_pos_lt_swap : forall r r1 r2,
-  r > 0 -> r2 > 0 -> r1 / r < r2 -> r1 / r2 < r.
-Proof. now intros r r1 r2 H1 H2 I; apply Rlt_div_chsd_rr, Rlt_div_chsd_rl. Qed.
-
-(* NEW, TODO move *)
-Lemma Rdiv_pos_nneg_le_swap : forall r r1 r2,
-  0 < r -> 0 <= r2 -> r1 / r <= r2 -> r1 / r2 <= r.
-Proof.
-  intros r r1 r2 H1 [H2 | <-] I; [| now rewrite Rdiv_0_r; left].
-  now apply Rle_div_chsd_rr, Rle_div_chsd_rl.
-Qed.
 
 (** ** Real sequences *)
 
@@ -348,8 +300,8 @@ Qed.
 (* TODO: these are a lot less practical to use than, say
          exists M, forall n, Un <= M (resp. m <= Un), state alternative
          definitions *)
-Definition has_ub (Un:nat -> R) : Prop := bound (EUn Un).
-Definition has_lb (Un:nat -> R) : Prop := bound (EUn (opp_seq Un)).
+Definition has_ub (Un:nat -> R) : Prop := bounded_from_above (EUn Un).
+Definition has_lb (Un:nat -> R) : Prop := bounded_from_above (EUn (opp_seq Un)).
 
 (* NEW *)
 Lemma Un_lb_set_seq :
@@ -387,7 +339,7 @@ Qed.
 (* NEW *)
 Lemma has_ub_set_seq : forall Un, has_ub Un <-> exists M, forall n, Un n <= M.
 Proof.
-  now intros Un; split; unfold has_ub, bound; setoid_rewrite Un_ub_set_seq.
+  now intros Un; split; unfold has_ub, bounded_from_above; setoid_rewrite Un_ub_set_seq.
 Qed.
 
 (** *** Least upper bounds and greatest lower bounds of sequences *)
@@ -646,7 +598,7 @@ Proof.
 Qed.
 
 Lemma Un_cv_crit : forall Un,
-  Un_growing Un -> bound (EUn Un) -> exists l : R, Un_cv Un l.
+  Un_growing Un -> bounded_from_above (EUn Un) -> exists l : R, Un_cv Un l.
 Proof.
   intros Un Hug Heub.
   destruct (completeness (EUn Un) Heub (EUn_noempty Un)) as (l, H).
@@ -968,7 +920,7 @@ Definition Cauchy_crit (Un : nat -> R) :=
   forall eps:R, eps > 0 -> exists N : nat, (forall n m:nat,
       (n >= N)%nat -> (m >= N)%nat -> Rdist (Un n) (Un m) < eps).
 
-Lemma cauchy_bound :forall Un,  Cauchy_crit Un -> bound (EUn Un).
+Lemma cauchy_bound :forall Un,  Cauchy_crit Un -> bounded_from_above (EUn Un).
 Proof.
   intros Un Cauchy; specialize (Cauchy 1 Rlt_0_1) as [N HN].
   destruct (finite_greater Un N) as [M HM].

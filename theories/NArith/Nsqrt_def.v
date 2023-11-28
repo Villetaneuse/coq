@@ -10,6 +10,7 @@
 
 Require Import BinNat.
 
+Attributes deprecated(since="8.19", note="Require BinNat instead.").
 (** Obsolete file, see [BinNat] now,
     only compatibility notations remain here. *)
 

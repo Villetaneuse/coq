@@ -12,6 +12,8 @@ Require Import BinPos.
 Require Import BinNat.
 Require Import Ndigits.
 
+Attributes deprecated(since="8.19", note="Please step up to maintain Ndist.v if you need it.").
+
 Local Set Warnings "-deprecated".
 (** An ultrametric distance over [N] numbers *)
 

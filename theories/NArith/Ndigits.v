@@ -14,6 +14,7 @@ Require Import Bool Morphisms Setoid Bvector BinPos BinNat PeanoNat Pnat Nnat
 Local Open Scope N_scope.
 Local Open Scope program_scope.
 
+Attributes deprecated(since="8.19", note="Use NArith.BinNat instead.").
 (** This file is mostly obsolete, see directly [BinNat] now. *)
 Local Set Warnings "-deprecated".
 

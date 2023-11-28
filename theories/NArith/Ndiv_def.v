@@ -11,6 +11,7 @@
 Require Import BinNat.
 Local Open Scope N_scope.
 
+Attributes deprecated(since="8.19", note="Use NArith.BinNat instead.").
 (** Obsolete file, see [BinNat] now,
     only compatibility notations remain here. *)
 

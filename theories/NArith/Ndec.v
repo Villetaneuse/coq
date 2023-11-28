@@ -19,6 +19,7 @@ Require Import Ndigits.
 
 Local Open Scope N_scope.
 
+Attributes deprecated(since="8.19", note="TODO").
 (** Obsolete results about boolean comparisons over [N],
     kept for compatibility with IntMap and SMC. *)
 

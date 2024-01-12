@@ -134,12 +134,18 @@ Module BackportEq (E:Eq)(F:IsEq E) <: IsEqOrig E.
  Definition eq_refl := @Equivalence_Reflexive _ _ F.eq_equiv.
  Definition eq_sym := @Equivalence_Symmetric _ _ F.eq_equiv.
  Definition eq_trans := @Equivalence_Transitive _ _ F.eq_equiv.
+#[global]
+ Instance neq_symmetric : Symmetric (fun x y => ~(E.eq x y)).
+ Proof. intros x y H H'; symmetry in H'; exact (H H'). Qed.
 End BackportEq.
 
 Module UpdateEq (E:Eq)(F:IsEqOrig E) <: IsEq E.
 #[global]
  Instance eq_equiv : Equivalence E.eq.
  Proof. exact (Build_Equivalence _ F.eq_refl F.eq_sym F.eq_trans). Qed.
+#[global]
+ Instance neq_symmetric : Symmetric (fun x y => ~(E.eq x y)).
+ Proof. intros x y H H'; symmetry in H'; exact (H H'). Qed.
 End UpdateEq.
 
 Module Backport_ET (E:EqualityType) <: EqualityTypeBoth

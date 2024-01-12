@@ -21,12 +21,9 @@ Proof.
 intros; split; symmetry; auto.
 Qed.
 
-(* TODO: how register ~= (which is just a notation) as a Symmetric relation,
-    hence allowing "symmetry" tac ? *)
-
 Theorem neq_sym : forall n m, n ~= m -> m ~= n.
 Proof.
-intros n m H1 H2; symmetry in H2; false_hyp H2 H1.
+intros n m H; symmetry; exact H.
 Qed.
 
 Theorem eq_stepl : forall x y z, x == y -> x == z -> z == y.
@@ -86,4 +83,4 @@ Tactic Notation "nzinduct" ident(n) constr(u) :=
   induction_maker n ltac:(apply (fun A A_wd => central_induction A A_wd u)).
 
 End NZBaseProp.
-
+Print NZBaseProp.

@@ -8,9 +8,27 @@
 (*         *     (see LICENSE file for the text of the license)         *)
 (************************************************************************)
 
-(** Euclidean Division *)
+(** * Euclidean Division
 
-Require Import NZAxioms NZMulOrder.
+This file gives a specification, in the form of the functor type [NZDivSpec], of
+the euclidean division for any implementation of [NZOrdAxiomsSig'] (see
+[NZAxioms]). The specification is loose if the dividend is negative or the
+divisor nonpositive since there are many different conventions in this case.
+
+On top of this specification is [NZDivSpec0] which further
+assumes that [a / 0 == 0] and [a mod 0].
+
+The module type [NZDivProp] then shows many basic properties of euclidean
+divisions conform to [NZDivSpec].
+Unfortunately, the generality of [NZDivSpec] adds a nonnegativity condition on
+the dividend, which is useless on natural numbers, in every lemma.
+
+The lemmas deriving from [NZDivSpec0] are proved elsewhere.
+*)
+
+From Coq.Numbers.NatInt Require Import NZAxioms NZMulOrder.
+
+(** ** Specification of the euclidean division *)
 
 (** The first signatures will be common to all divisions over NZ, N and Z *)
 
@@ -49,12 +67,13 @@ End NZDivSpec0.
 Module Type NZDiv (A : NZOrdAxiomsSig) := DivMod A <+ NZDivSpec A.
 Module Type NZDiv' (A : NZOrdAxiomsSig) := NZDiv A <+ DivModNotation A.
 
+(** ** Common results for euclidean divisions conform to [NZDivSpec] *)
 Module Type NZDivProp
  (Import A : NZOrdAxiomsSig')
  (Import B : NZDiv' A)
  (Import C : NZMulOrderProp A).
 
-(** Uniqueness theorems *)
+(** *** Uniqueness theorems *)
 
 Theorem div_mod_unique :
  forall b q1 q2 r1 r2, 0<=r1<b -> 0<=r2<b ->
@@ -107,7 +126,7 @@ Proof.
  intros Ha Hb H. apply div_unique with 0; nzsimpl; now try split.
 Qed.
 
-(** A division by itself returns 1 *)
+(** *** Basic lemmas *)
 
 Lemma div_same : forall a, 0<a -> a/a == 1.
 Proof.
@@ -121,8 +140,6 @@ apply mod_unique with 1; intuition auto; try order.
 now nzsimpl.
 Qed.
 
-(** A division of a small number by a bigger one yields zero. *)
-
 Theorem div_small: forall a b, 0<=a<b -> a/b == 0.
 Proof.
 intros a b ?. symmetry.
@@ -130,16 +147,12 @@ apply div_unique with a; intuition; try order.
 now nzsimpl.
 Qed.
 
-(** Same situation, in term of modulo: *)
-
 Theorem mod_small: forall a b, 0<=a<b -> a mod b == a.
 Proof.
 intros. symmetry.
 apply mod_unique with 0; intuition; try order.
 now nzsimpl.
 Qed.
-
-(** * Basic values of divisions and modulo. *)
 
 Lemma div_0_l: forall a, 0<a -> 0/a == 0.
 Proof.
@@ -189,9 +202,7 @@ apply mod_unique with a; try split; try order.
 Qed.
 
 
-(** * Order results about mod and div *)
-
-(** A modulo cannot grow beyond its starting point. *)
+(** *** Order results about mod and div *)
 
 Theorem mod_le: forall a b, 0<=a -> 0<b -> a mod b <= a.
 Proof.
@@ -202,8 +213,6 @@ intros a b ? ?. destruct (le_gt_cases b a).
   apply mod_small; auto.
 Qed.
 
-
-(* Division of positive numbers is positive. *)
 
 Lemma div_pos: forall a b, 0<=a -> 0<b -> 0 <= a/b.
 Proof.
@@ -251,9 +260,6 @@ intros a b Ha Hb; split; intros Hab.
 Qed.
 
 
-(** As soon as the divisor is strictly greater than 1,
-    the division is strictly decreasing. *)
-
 Lemma div_lt : forall a b, 0<a -> 1<b -> a/b < a.
 Proof.
 intros a b ? ?.
@@ -269,7 +275,7 @@ destruct (lt_ge_cases a b).
     rewrite <- add_le_mono_l. destruct (mod_bound_pos a b); order.
 Qed.
 
-(** [le] is compatible with a positive division. *)
+(** The [le] relation is compatible with division by a positive number. *)
 
 Lemma div_le_mono : forall a b c, 0<c -> 0<=a<=b -> a/c <= b/c.
 Proof.
@@ -289,7 +295,7 @@ apply le_trans with (c+0).
 - rewrite <- add_le_mono_l. destruct (mod_bound_pos a c); order.
 Qed.
 
-(** The following two properties could be used as specification of div *)
+(** The following two properties could be used as specification of div. *)
 
 Lemma mul_div_le : forall a b, 0<=a -> 0<b -> b*(a/b) <= a.
 Proof.
@@ -318,7 +324,7 @@ rewrite <- (add_0_r (b*(a/b))) at 2.
 apply add_cancel_l.
 Qed.
 
-(** Some additional inequalities about div. *)
+(** Some additional inequalities about div *)
 
 Theorem div_lt_upper_bound:
   forall a b q, 0<=a -> 0<b -> a < b*q -> a/b < q.
@@ -366,7 +372,7 @@ Proof.
 Qed.
 
 
-(** * Relations between usual operations and mod and div *)
+(** *** Relations between usual operations and mod and div *)
 
 Lemma mod_add : forall a b c, 0<=a -> 0<=a+b*c -> 0<c ->
  (a + b * c) mod c == a mod c.
@@ -397,7 +403,7 @@ Proof.
  intros. apply div_add; auto.
 Qed.
 
-(** Cancellations. *)
+(** *** Cancellations *)
 
 Lemma div_mul_cancel_r : forall a b c, 0<=a -> 0<b -> 0<c ->
  (a*c)/(b*c) == a/b.
@@ -421,7 +427,7 @@ Proof.
  intros a b c ? ? ?. rewrite !(mul_comm c); apply div_mul_cancel_r; auto.
 Qed.
 
-(** Operations modulo. *)
+(** Operations modulo *)
 
 Theorem mod_mod: forall a n, 0<=a -> 0<n ->
  (a mod n) mod n == a mod n.
@@ -542,8 +548,6 @@ Proof.
  intros a b c ? ? ?. now rewrite !(mul_comm _ c), mul_mod_distr_l.
 Qed.
 
-(** A last inequality: *)
-
 Theorem div_mul_le:
  forall a b c, 0<=a -> 0<b -> 0<=c -> c*(a/b) <= (c*a)/b.
 Proof.
@@ -554,8 +558,6 @@ Proof.
    apply mul_le_mono_nonneg_l; auto.
    apply mul_div_le; auto.
 Qed.
-
-(** mod is related to divisibility *)
 
 Lemma mod_divides : forall a b, 0<=a -> 0<b ->
  (a mod b == 0 <-> exists c, a == b*c).

@@ -12,6 +12,11 @@ Contents
    self
 
 .. toctree::
+   :caption: Rocqtop examples
+
+   examples/rocqtop
+
+.. toctree::
    :caption: Specification language
 
    language/core/index

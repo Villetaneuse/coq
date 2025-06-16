@@ -36,3 +36,21 @@ Rocqtop Examples
    nat. (* comment *)
    Check (* comment *) nat
    .
+
+.. rocqtop:: reset all
+
+   Check 0.
+   (* comment0 *)
+
+
+   Check 1.
+
+
+   (* comment1 *)
+
+
+   Check 2.
+
+
+   (* comment2 *)
+   Check 3.
